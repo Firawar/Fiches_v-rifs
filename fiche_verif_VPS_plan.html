@@ -98,16 +98,17 @@ body{
   font-size:9px;
   text-transform:uppercase;
   letter-spacing:.1em;
-  color:#8FA0C2;
+  color:var(--orange-light);
+  font-weight:600;
 }
 .meta-fields input{
-  background:rgba(255,255,255,.08);
-  border:1px solid rgba(255,255,255,.18);
+  background:rgba(255,255,255,.13);
+  border:1.5px solid rgba(255,255,255,.4);
   color:#fff;
   border-radius:6px;
-  padding:6px 9px;
+  padding:7px 10px;
   font-family:'Inter',sans-serif;
-  font-size:13px;
+  font-size:14px;
   min-width:110px;
 }
 .meta-fields input::placeholder{color:#8FA0C2;}
@@ -124,7 +125,7 @@ body{
   height:74px;
   flex:0 0 auto;
 }
-.dial-wrap svg{transform:rotate(-90deg);}
+.dial-wrap svg{transform:rotate(-90deg);width:100%;height:100%;}
 .dial-track{stroke:rgba(255,255,255,.14);}
 .dial-progress{
   stroke:var(--orange);
@@ -635,8 +636,20 @@ main{
 }
 
 @media (max-width:480px){
-  .dash-instruments{order:3;width:100%;justify-content:flex-start;margin-top:6px;}
-  .meta-fields input{min-width:90px;}
+  .app-header{padding:12px 14px 10px;}
+  .brand-text .eyebrow{font-size:8.5px;}
+  .brand-text h1{font-size:16px;}
+  .header-row{gap:10px;}
+  .brand{flex-basis:auto;min-width:0;}
+  .meta-fields{order:2;flex-basis:100%;width:100%;}
+  .meta-fields .field{width:100%;}
+  .meta-fields label{font-size:10.5px;}
+  .meta-fields input{width:100%;font-size:15px;padding:9px 11px;min-width:0;}
+  .dash-instruments{order:3;width:100%;justify-content:flex-start;margin-top:2px;gap:10px;}
+  .dial-wrap{width:56px;height:56px;}
+  .digital-counter{padding:4px 10px;min-width:56px;}
+  .legend{margin-top:8px;gap:10px;}
+  .legend .li{font-size:10px;}
   .action-bar{padding:8px 8px;gap:5px;}
   .action-bar button{padding:10px 8px;font-size:11.5px;gap:3px;}
   .btn-primary{max-width:none;}
@@ -781,12 +794,17 @@ function zoneRect(id, x, y, w, h, label){
 }
 
 /* ============================================================
-   PAGE 1 : CABINE AVANT  (page 1 du PDF — camion côté gauche)
+   PAGE "CABINE ET LATÉRALE"  (page 1 du PDF — camion côté gauche)
    ------------------------------------------------------------
-   tag 1  porteavant   Porte avant (conducteur / passager / siège)
-   tag 4  civiere      Porte arrière — Civière & matériel lourd
+   INDEX — Ctrl+F "ZONE : <NOM>" pour sauter à une zone
+   tag Cabine        porteavant   Porte avant (conducteur/passager/siège/admin)
+   tag Porte arrière civiere      Porte arrière — Civière & matériel lourd
    ============================================================ */
 const ZONES_RAW_CABINE = [
+  /* ===============================================================
+     ZONE : PORTE AVANT  (id: porteavant, tag "Cabine")
+     Sous-groupes : Porte conducteur / Porte passager / Siège passager / Administratif
+     =============================================================== */
   { id:'porteavant', label:'Porte avant', code:'DT-03-02', groups:[
     { title:'Porte conducteur', items:[
       {name:'Paire de gants de manutention', qty:1},
@@ -808,6 +826,10 @@ const ZONES_RAW_CABINE = [
       {name:'Administratif véhicule', qty:1},
     ]},
   ]},
+  /* ===============================================================
+     ZONE : PORTE ARRIÈRE — CIVIÈRE & MATÉRIEL LOURD
+     (id: civiere, tag "Porte arrière")
+     =============================================================== */
   { id:'civiere', label:'Porte arrière — Civière & matériel lourd', code:'DT-03-02', items:[
     {name:"Kit membres sectionnés (3 tailles)", qty:1},
     {name:'Attelle cervico-thoracique', qty:1},
@@ -851,14 +873,23 @@ const ZONE_ORDER_CABINE = {};
    tag Oxy saco2        Sac O2           (groupée : enfant/adulte/pochette/bouteille)
    ============================================================ */
 const ZONES_RAW_RANGEMENTS = [
+  /* ===============================================
+     ZONE : CAPUCINE GAUCHE  (id: capucine_g, tag 1)
+     =============================================== */
   { id:'capucine_g', label:'Capucine gauche', code:'DT-03-02', items:[
     {name:'Casques F2', qty:3},
     {name:'Gilet Haute Visibilité', qty:2},
   ]},
+  /* ===============================================
+     ZONE : CAPUCINE DROITE  (id: capucine_d, tag 2)
+     =============================================== */
   { id:'capucine_d', label:'Capucine droite', code:'DT-03-02', items:[
     {name:'Casques F2', qty:2},
     {name:'Boîte gants XL', qty:1},
   ]},
+  /* ===================================================
+     ZONE : PLACARD 3 — DOCUMENTS  (id: placard3, tag 3)
+     =================================================== */
   { id:'placard3', label:'Placard 3 — Documents', code:'DT-03-02', items:[
     {name:'Lot de piles de rechange AAA et AA', qty:1},
     {name:'Bloc de fiches bilans', qty:1},
@@ -867,9 +898,15 @@ const ZONES_RAW_RANGEMENTS = [
     {name:'Main courante', qty:1},
     {name:'Cahier de suivi de victime (5 fiches min.)', qty:1},
   ]},
+  /* =======================================
+     ZONE : ARMOIRE 1  (id: armoire1, tag 4)
+     ======================================= */
   { id:'armoire1', label:'Armoire 1', code:'DT-03-02', items:[
     {name:'Couverture bactériostatique', qty:1},
   ]},
+  /* =============================================
+     ZONE : SAC DE SOIN  (id: sacdesoin, tag soin)
+     ============================================= */
   { id:'sacdesoin', label:'Sac de soin', code:'DT-05-02', groups:[
     { title:'Pochette dessus', items:[
       {name:'Sac DAOM 30L', qty:2},
@@ -940,6 +977,9 @@ const ZONES_RAW_RANGEMENTS = [
       {name:'Bloc fiches bilan', qty:1},
     ]},
   ]},
+  /* ========================================
+     ZONE : PLACARD 1  (id: placard1, tag 12)
+     ======================================== */
   { id:'placard1', label:'Placard 1', code:'DT-03-02', groups:[
     { title:'Matériel', items:[
       {name:'Colliers cervicaux (6 tailles) type SOBER', qty:1},
@@ -955,6 +995,9 @@ const ZONES_RAW_RANGEMENTS = [
       {name:'Sac vomitoire', qty:5},
     ]},
   ]},
+  /* ===========================================================
+     ZONE : PLACARD 2 — KITS SPÉCIALISÉS  (id: placard2, tag 13)
+     =========================================================== */
   { id:'placard2', label:'Placard 2 — Kits spécialisés', code:'DT-03-02', items:[
     {name:'Kit accouchement', qty:1},
     {name:'Kit SNV', qty:1},
@@ -962,6 +1005,9 @@ const ZONES_RAW_RANGEMENTS = [
     {name:'Kit AERV', qty:1},
     {name:'Kit risques biologique renforcé', qty:1},
   ]},
+  /* =====================================
+     ZONE : TIROIR 1  (id: tiroir1, tag 5)
+     ===================================== */
   { id:'tiroir1', label:'Tiroir 1', code:'DT-03-02', groups:[
     { title:'Poche bleue', items:[
       {name:'Sérum physiologique 5ml', qty:40},
@@ -996,6 +1042,9 @@ const ZONES_RAW_RANGEMENTS = [
       {name:'Tensiomètre manuel + stéthoscope + 3 tailles de brassards', qty:1},
     ]},
   ]},
+  /* =====================================
+     ZONE : TIROIR 2  (id: tiroir2, tag 6)
+     ===================================== */
   { id:'tiroir2', label:'Tiroir 2', code:'DT-03-02', items:[
     {name:'Champ stérile', qty:2},
     {name:'OPTC', qty:2},
@@ -1014,6 +1063,9 @@ const ZONES_RAW_RANGEMENTS = [
     {name:'Gobelet', qty:5},
     {name:"Bouteille d'eau 50cl", qty:1},
   ]},
+  /* =====================================
+     ZONE : TIROIR 3  (id: tiroir3, tag 7)
+     ===================================== */
   { id:'tiroir3', label:'Tiroir 3', code:'DT-03-02', groups:[
     { title:'Pédiatrique', items:[
       {name:'BAVU pédiatrique (masques T0/1/2)', qty:1},
@@ -1031,11 +1083,17 @@ const ZONES_RAW_RANGEMENTS = [
       {name:'Sonde aspiration (CH18 à CH26)', qty:5},
     ]},
   ]},
+  /* =====================================
+     ZONE : TRAPPE 1  (id: trappe1, tag 8)
+     ===================================== */
   { id:'trappe1', label:'Trappe 1', code:'DT-03-02', items:[
     {name:'Draps à usage unique', qty:10},
     {name:"Litres d'eau", qty:6},
     {name:'Gobelet usage unique', qty:50},
   ]},
+  /* =====================================
+     ZONE : TRAPPE 2  (id: trappe2, tag 9)
+     ===================================== */
   { id:'trappe2', label:'Trappe 2', code:'DT-03-02', items:[
     {name:"Spray Surf'anios", qty:1},
     {name:'Paquet de lingettes de nettoyage', qty:2},
@@ -1043,15 +1101,28 @@ const ZONES_RAW_RANGEMENTS = [
     {name:'Masque FFP2', qty:10},
     {name:'Boîte gants XL/L/M/S', qty:1},
   ]},
+  /* ======================================
+     ZONE : TRAPPE 3  (id: trappe3, tag 10)
+     ====================================== */
   { id:'trappe3', label:'Trappe 3', code:'DT-03-02', items:[
     {name:'Réservée aux affaires des secouristes', type:'check'},
   ]},
+  /* ======================================
+     ZONE : TRAPPE 4  (id: trappe4, tag 11)
+     ====================================== */
   { id:'trappe4', label:'Trappe 4', code:'DT-03-02', items:[
     {name:'Gilet pare-lames', qty:4},
   ]},
+  /* ======================================
+     ZONE : TRAPPE 5  (id: trappe5, tag 14)
+     ====================================== */
   { id:'trappe5', label:'Trappe 5', code:'DT-03-02', items:[
     {name:'Câble branchement 220V', qty:1},
+    {name:'Jeu de clef de dépannage', qty:1},
   ]},
+  /* ===================================
+     ZONE : SAC O2  (id: saco2, tag Oxy)
+     =================================== */
   { id:'saco2', label:'Sac O2', code:'DT-05-02', groups:[
     { title:'Enfant', items:[
       {name:'MHC pédiatrique', qty:2},
